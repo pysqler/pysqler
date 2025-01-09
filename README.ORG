@@ -1,0 +1,24 @@
+#+title: PySQLer
+#+author: SciPunch
+
+* Description
+Fearless SQL queries in your Python project
+
+* Ideas
+- Integrate [[https://github.com/jarulraj/sqlcheck][sqlcheck]]
+- Allow to use SQL formatter for the queries
+- Exclude some queries from analysis
+- Respect .gitignore
+- Strict mode
+  - Check type sizes (int, str, etc)
+
+* Backlog
+** Parse SQL query and extract bind parameters
+** Infer bind parameters ptyhon types
+** Extract bind parameters sql types
+** Generate random values for binding
+** Execute SQL queries
+** Categorize SQL DB errors
+** Common\uncommon things about most popular RDBMs
+** List of sql libraries for python
+** Check returend value from SQL handled correctly
