@@ -4,6 +4,16 @@
 * Description
 Fearless SQL queries in your Python project. PySQLer parses SQL queries from the entire project and checks their correctness during execution on the database. It knows how to infer types from the Python side, so it is capable of catching most of the 'dumb' issues before the actual app run.
 
+* How it works
+1. Parses [[https://en.wikipedia.org/wiki/Abstract_syntax_tree][AST]] of each python module (with help of [[https://docs.python.org/3/library/ast.html][ast module]]) and saves all SQL queiries (by regexp)
+2. Groups queries into simple and with bound params
+3. Resolves sql library (e.g. [[https://magicstack.github.io/asyncpg/current/][asyncpg]], [[https://www.psycopg.org/][psycopg]], [[https://www.sqlalchemy.org/][sqlalchemy]] and etc)
+4. Based on the p.3 extracts / infers types of them (with help of [[https://docs.python.org/3/library/typing.html][typing]])
+5. Extrats SQL types of fields to which params were bounded (by reading database schema)
+6. Mocks data for the bounded values (by [[https://mimesis.name/master/][mimesis]] or any other fake data provider)
+7. Executes queries and gathers errors
+8. Prints report
+
 * Ideas
 - Integrate [[https://github.com/jarulraj/sqlcheck][sqlcheck]]
 - Allow to use SQL formatter for the queries
