@@ -2,7 +2,7 @@
 #+author: SciPunch
 
 * Description
-Fearless SQL queries in your Python project. PySQLer parses SQL queries from the entire project and checks their correctness during execution on the database. It knows how to infer types from the Python side, so it is capable of catching most of the 'dumb' issues before the actual app runs.
+Fearless SQL queries in your Python project. PySQLer parses SQL queries from the entire project and checks their correctness during execution on the database. It knows how to infer types from the Python side, so it is capable of catching most of the 'dumb' issues before the actual app run.
 
 * Ideas
 - Integrate [[https://github.com/jarulraj/sqlcheck][sqlcheck]]
