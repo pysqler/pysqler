@@ -19,6 +19,7 @@ Fearless SQL queries in your Python project. PySQLer parses SQL queries from the
 - Allow to use SQL formatter for the queries
 - Exclude some queries from analysis
 - Respect .gitignore
+- Mark exceptions that wasn't hendler (e.g unique contraint)
 - Strict mode
   - Check type sizes (int, str, etc)
 
