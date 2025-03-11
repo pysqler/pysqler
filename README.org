@@ -9,11 +9,11 @@ Fearless SQL queries in your Python project. PySQLer parses SQL queries from the
 
 ** Main algorithm
 
-1. Parse [[https://en.wikipedia.org/wiki/Abstract_syntax_tree][AST]] of each python module (with help of [[https://docs.python.org/3/library/ast.html][ast module]]) and saves all SQL queiries with help of [[https://github.com/andialbrecht/sqlparse][sqlparse]]
-2. Group queries by existence of bound params
-3. Resolve sql library (e.g. [[https://magicstack.github.io/asyncpg/current/][asyncpg]], [[https://www.psycopg.org/][psycopg]], [[https://www.sqlalchemy.org/][sqlalchemy]] and etc)
-4. Based on the p.3 infer types of bound params (with help of [[https://docs.python.org/3/library/typing.html][typing]])
-5. Extrat SQL types of fields to which params were bounded (by reading database schema)
+1. Parse [[https://en.wikipedia.org/wiki/Abstract_syntax_tree][AST]] of each python module (with help of [[https://docs.python.org/3/library/ast.html][ast module]]) and saves all SQL queries with help of [[https://github.com/andialbrecht/sqlparse][sqlparse]]
+2. Group queries by existence of bound parameters
+3. Resolve SQL library (e.g. [[https://magicstack.github.io/asyncpg/current/][asyncpg]], [[https://www.psycopg.org/][psycopg]], [[https://www.sqlalchemy.org/][sqlalchemy]] and etc)
+4. Based on the p.3 infer types of bound parameters (with help of [[https://docs.python.org/3/library/typing.html][typing]])
+5. Extract SQL types of fields to which parameters were bounded (by reading database schema)
 6. Mock data for the bounded values (by [[https://mimesis.name/master/][mimesis]] or any other fake data provider)
 7. Create database with the same schema as in provided one
 8. Execute queries and gathers errors
@@ -40,12 +40,11 @@ People who don't use GNU Emacs compile or don't live in a terminal can generate 
 
 *** Caching
 
-We hash and store queries with their results by default in the local sqlite database
+We hash and store queries with their results by default in the local SQLite database
 
 * Ideas
 
 - Exclude some queries from analysis
 - Respect .gitignore
-- Mark exceptions that wasn't handled (e.g unique contraint, possible missing foreign key and etc.)
-- Check type sizes (int, str, etc)
+- Mark exceptions that wasn't handled (e.g unique constraint, possible missing foreign key and etc.)
 - Predict time or IO consuming SQL queries
