@@ -2,34 +2,50 @@
 #+author: SciPunch
 
 * Description
-Fearless SQL queries in your Python project. PySQLer parses SQL queries from the entire project and checks their correctness during execution on the database. It knows how to infer types from the Python side, so it is capable of catching most of the 'dumb' issues before the actual app run.
+
+Fearless SQL queries in your Python project. PySQLer parses SQL queries from the entire project and checks their correctness during execution on the database. It knows how to infer types from the Python side, so it is capable of catching most of the issues before the actual app run.
 
 * How it works
-1. Parses [[https://en.wikipedia.org/wiki/Abstract_syntax_tree][AST]] of each python module (with help of [[https://docs.python.org/3/library/ast.html][ast module]]) and saves all SQL queiries (by regexp)
-2. Groups queries into simple and with bound params
-3. Resolves sql library (e.g. [[https://magicstack.github.io/asyncpg/current/][asyncpg]], [[https://www.psycopg.org/][psycopg]], [[https://www.sqlalchemy.org/][sqlalchemy]] and etc)
-4. Based on the p.3 extracts / infers types of them (with help of [[https://docs.python.org/3/library/typing.html][typing]])
-5. Extrats SQL types of fields to which params were bounded (by reading database schema)
-6. Mocks data for the bounded values (by [[https://mimesis.name/master/][mimesis]] or any other fake data provider)
-7. Executes queries and gathers errors
-8. Prints report
+
+** Main algorithm
+
+1. Parse [[https://en.wikipedia.org/wiki/Abstract_syntax_tree][AST]] of each python module (with help of [[https://docs.python.org/3/library/ast.html][ast module]]) and saves all SQL queiries with help of [[https://github.com/andialbrecht/sqlparse][sqlparse]]
+2. Group queries by existence of bound params
+3. Resolve sql library (e.g. [[https://magicstack.github.io/asyncpg/current/][asyncpg]], [[https://www.psycopg.org/][psycopg]], [[https://www.sqlalchemy.org/][sqlalchemy]] and etc)
+4. Based on the p.3 infer types of bound params (with help of [[https://docs.python.org/3/library/typing.html][typing]])
+5. Extrat SQL types of fields to which params were bounded (by reading database schema)
+6. Mock data for the bounded values (by [[https://mimesis.name/master/][mimesis]] or any other fake data provider)
+7. Create database with the same schema as in provided one
+8. Execute queries and gathers errors
+9. Print report
+
+** Additions
+
+*** Plugin system
+
+After [[5. Extrats SQL types of fields to which params were bounded (by reading database schema)][p.5 of main algorithm]] we know the following about each SQL query:
+
+- It's exact position in the file (stored in the AST)
+- Bounded parameters types and their mapping to the SQL table's
+- Library which is used on a Python side
+
+This information allows us to introduce plugin system which makes possible:
+
+- Do additional linting with ([[https://github.com/jarulraj/sqlcheck][sqlcheck]], [[https://sqlfluff.com/][sqlfluff]] and any other program)
+- Format queries in place with formatter of choice
+
+*** Interactive web report
+
+People who don't use GNU Emacs compile or don't live in a terminal can generate web report and get mouse friendly interface to overview analyzed SQL queries, find issues and possible ways to fix them. Highly inspired by [[https://coverage.readthedocs.io/en/7.6.12/index.html][coverage]]'s [[https://nedbatchelder.com/files/sample_coverage_html/index.html][HTML report]]
+
+*** Caching
+
+We hash and store queries with their results by default in the local sqlite database
 
 * Ideas
-- Integrate [[https://github.com/jarulraj/sqlcheck][sqlcheck]]
-- Allow to use SQL formatter for the queries
+
 - Exclude some queries from analysis
 - Respect .gitignore
-- Mark exceptions that wasn't hendler (e.g unique contraint)
-- Strict mode
-  - Check type sizes (int, str, etc)
-
-* Backlog
-** Parse SQL query and extract bind parameters
-** Infer bind parameters python types
-** Extract bind parameters sql types
-** Generate random values for binding
-** Execute SQL queries
-** Categorize SQL DB errors
-** Common\uncommon things about most popular RDBMs
-** List of sql libraries for python
-** Check returend value from SQL handled correctly
+- Mark exceptions that wasn't handled (e.g unique contraint, possible missing foreign key and etc.)
+- Check type sizes (int, str, etc)
+- Predict time or IO consuming SQL queries
