@@ -1,0 +1,105 @@
+[project]
+name = "pysqler"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.org"
+requires-python = ">=3.13"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "codespell>=2.4.1",
+    "coverage>=7.6.12",
+    "mypy>=1.15.0",
+    "ruff>=0.9.4",
+]
+
+[tool.ruff.lint]
+select = [
+  "A",    # flake8-builtins
+  "ARG",  # flake8-unused-arguments
+  "B",    # flake8-bugbear
+  "C4",   # flake8-comprehensions
+  "C90",  # maccabe
+  "DTZ",  # flake8-atetimez
+  "E",    # pycodestyle
+  "ERA",  # flake8-eradicate
+  "EXE",  # flake8-executable
+  "F",    # pyflakes
+  "FBT",  # flake8-boolean-trap
+  "FLY",  # pyflint
+  "FURB", # refurb
+  "G",    # flake8-logging-format
+  "I",    # isort
+  "ICN",  # flake8-import-conventions
+  "ISC",  # flake8-implicit-str-concat
+  "LOG",  # flake8-logging
+  "N",    # pep8-naming
+  "PERF", # perflint
+  "PIE",  # flake8-pie
+  "PL",   # pylint
+  "PT",   # flake8-pytest-style
+  "PTH",  # flake8-use-pathlib
+  "Q",    # flake8-quotes
+  "RET",  # flake8-return
+  "RSE",  # flake8-raise
+  "RUF",  # ruff
+  "S",    # flake8-bandit
+  "SIM",  # flake8-simpify
+  "SLF",  # flake8-self
+  "SLOT", # flake8-slots
+  "T100", # flake8-debugger
+  "TRY",  # tryceratops
+  "UP",   # pyupgrade
+  "W",    # pycodestyle
+  "YTT",  # flake8-2020
+  "E",    # pycodestyle
+  "F",    # Pyflakes
+  "UP",   # pyupgrade
+  "B",    # flake8-bugbear
+  "SIM",  # flake8-simplify
+  "I",    # isort
+]
+ignore = [
+  "D100", # Missing docsdting in public module
+  "D101", # Missing docstring in public class
+  "D102", # Missing docstring in public method
+  "D103", # Missing docstring in public function
+  "D104", # Missing docstring in public package
+  "D105", # Missing docstring in magic method
+  "D107", # Missing docstring in `__init__`
+  "PLR0913", # Too many arguments in function definition
+  "S101", # Use of `assert` detected
+  "A005", # Module shadows a Python standard-library module
+  "PT013", # pytest import consistency
+]
+
+external = [ "WPS" ]
+allowed-confusables = ["а", "А", "б", "Б", "в", "В", "г", "Г", "е", "Е", "з", "З", "и", "И", "к", "К", "м", "М", "н", "Н", "о", "О", "р", "Р", "с", "С", "у", "У", "ф", "Ф", "х", "Х"]
+
+[tool.mypy]
+# The mypy configurations: http://bit.ly/2zEl9WI
+allow_redefinition = true
+strict = true
+local_partial_types = true
+warn_unreachable = true
+
+enable_error_code = [
+  "truthy-bool",
+  "truthy-iterable",
+  "redundant-expr",
+  "unused-awaitable",
+  "possibly-undefined",
+  "redundant-self",
+  "unimported-reveal",
+  "deprecated",
+]
+
+disallow_untyped_decorators = false
+
+untyped_calls_exclude = [
+]
+
+[[tool.mypy.overrides]]
+module = []
+follow_untyped_imports = true
