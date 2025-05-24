@@ -1,6 +1,8 @@
 import ast
 import os
 import re
+import sqlparse
+
 
 SELECT_REGEX = re.compile(".*select.+from.*")
 UPDATE_REGEX = re.compile(r".*update.*set.*=.*")
@@ -25,6 +27,14 @@ def traverse_ast(tree: ast.AST) -> list[ast.Constant]:
 
     return sql_nodes
 
+def extract_sql_queries(doc) -> list:
+    sql_queries = []
+    for string in doc:
+        string = ast.unparse(string)
+        parsed = sqlparse.parse(string)
+        if parsed:
+            sql_queries.append(string)
+    return sql_queries
 
 def has_sql_format(s: str) -> bool:
     """
@@ -54,6 +64,11 @@ def main():
             continue
         print(f"{file=}, {len(nodes)=}")
 
+        for node in nodes:
+            print(ast.unparse(node))
+        print()
+        sql_queries = extract_sql_queries(nodes)
+        print(sql_queries)
 
 if __name__ == "__main__":
     import sys
