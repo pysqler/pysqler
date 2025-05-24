@@ -7,6 +7,38 @@ Fearless SQL queries in your Python project. PySQLer parses SQL queries from the
 
 * How it works
 
+** Component design
+
+#+begin_src plantuml :file ./img/component-design.png
+left to right direction
+
+package PySQLer {
+  folder "3rd party library" {
+    [sqlparse]
+    [pytype]
+  }
+
+  folder "Database specific" {
+    [asyncpg]
+    [psycopg3]
+  }
+}
+
+database DataBase {
+}
+
+package Plugins {
+  [sqlfluff]
+  [sqlformat]
+}
+
+PySQLer --> DataBase
+PySQLer --> Plugins
+#+end_src
+
+#+RESULTS:
+[[file:./img/component-design.png]]
+
 ** Main algorithm
 
 1. Parse [[https://en.wikipedia.org/wiki/Abstract_syntax_tree][AST]] of each python module (with help of [[https://docs.python.org/3/library/ast.html][ast module]]) and saves all SQL queries with help of [[https://github.com/andialbrecht/sqlparse][sqlparse]]

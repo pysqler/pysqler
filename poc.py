@@ -12,14 +12,14 @@ SQL_QUERY_REGEXES = (SELECT_REGEX, UPDATE_REGEX, DELETE_REGEX)
 
 def traverse_ast(tree: ast.AST) -> list[ast.Constant]:
     sql_nodes = []
-    
+
     for node in ast.walk(tree):
         if not isinstance(node, ast.Constant):
             continue
 
         if not isinstance(node.value, str):
             continue
-        
+
         if not has_sql_format(node.value):
             continue
 
@@ -53,7 +53,7 @@ def main():
     py_modules = []
     for root, dirs, files in os.walk("."):
         for file in files:
-            if file.endswith('.py'):
+            if file.endswith(".py"):
                 py_modules.append(os.path.join(root, file))
 
     for file in py_modules:
@@ -72,8 +72,10 @@ def main():
 
 if __name__ == "__main__":
     import sys
+
     if len(sys.argv) > 1 and sys.argv[1] == "--test":
         import doctest
+
         doctest.testmod()
     else:
         main()
