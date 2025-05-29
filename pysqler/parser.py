@@ -7,12 +7,13 @@ from sqlparse.sql import Statement
 
 @dataclass
 class SqlAstNode:
-    query: tuple[Statement, ...]
+    stmt: Statement
     node: ast.Constant
+    has_placeholders: bool
 
 
 def extract_sql_nodes(tree: ast.AST) -> list[SqlAstNode]:
-    nodes = []
+    nodes: list[SqlAstNode] = []
     for node in ast.walk(tree):
         if not isinstance(node, ast.Constant):
             continue
@@ -20,22 +21,26 @@ def extract_sql_nodes(tree: ast.AST) -> list[SqlAstNode]:
         if not isinstance(node.value, str):
             continue
 
-        if query := _maybe_extract_sql_query(node):
-            nodes.append(SqlAstNode(query=query, node=node))
+        nodes.extend(
+            SqlAstNode(stmt=stmt, node=node, has_placeholders=_find_placeholder(stmt))
+            for stmt in _maybe_extract_sql_query(node)
+        )
 
     return nodes
 
 
-def _maybe_extract_sql_query(node: ast.Constant) -> None | tuple[Statement, ...]:
+def _maybe_extract_sql_query(node: ast.Constant) -> list[Statement]:
     sql_str = ast.unparse(node)[1:-1]
 
     parsed = sqlparse.parse(sql_str)
     assert isinstance(parsed, tuple)
+    result = []
     for stmt in parsed:
         for token in stmt:
             if token.is_keyword:
-                return parsed
-    return None
+                result.append(stmt)
+                break
+    return result
 
 
 def _find_placeholder(stmt: Statement) -> bool:

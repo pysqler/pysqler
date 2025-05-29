@@ -12,16 +12,10 @@ sql = [
 ]
 
 
-# фикстура
 @pytest.fixture
 def conn() -> Generator[sqlite3.Connection]:
-    # setup: создаём подключение
     conn = sqlite3.connect("")
-    conn.commit()
-
-    yield conn  # передаём объект тесту
-
-    # teardown: закрываем соединение
+    yield conn
     conn.close()
 
 
@@ -29,5 +23,4 @@ def test_fetches_valid_schema(conn: sqlite3.Connection) -> None:
     cursor = conn.cursor()
     for table in sql:
         cursor.execute(table)
-
     assert _sqlite3.extract_schema(conn) == sql
