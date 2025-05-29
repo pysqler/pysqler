@@ -3,8 +3,8 @@ import sqlite3
 
 
 def create_connection(db_name):
-    conn = sqlite3.connect(db_name)
-    return conn
+    return sqlite3.connect(db_name)
+
 
 def create_table(conn):
     sql = """
@@ -17,17 +17,22 @@ def create_table(conn):
     conn.execute(sql)
     conn.commit()
 
+
 def insert_users(conn, user_data):
     sql = "INSERT INTO users (name, age, mode) VALUES (?, 123, ?);"
     conn.executemany(sql, user_data)
     conn.commit()
 
+
 def fetch_users(conn):
     cursor = conn.execute("SELECT id, name, age FROM users;")
     return cursor.fetchall()
 
+
 def filter_adults(users):
-    return [user for user in users if user[2] >= 18]
+    age = 18
+    return [user for user in users if user[2] >= age]
+
 
 def main():
     db_name = "example.db"
@@ -35,12 +40,7 @@ def main():
 
     create_table(conn)
 
-    users = [
-        ("Алиса", 30),
-        ("Боб", 17),
-        ("Карина", 25),
-        ("Данил", 15)
-    ]
+    users = [("Алиса", 30), ("Боб", 17), ("Карина", 25), ("Данил", 15)]
     insert_users(conn, users)
 
     all_users = fetch_users(conn)
@@ -54,6 +54,7 @@ def main():
         print(user)
 
     conn.close()
+
 
 if __name__ == "__main__":
     main()
