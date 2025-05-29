@@ -4,13 +4,16 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.org"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "sqlparse>=0.5.3",
+]
 
 [dependency-groups]
 dev = [
     "codespell>=2.4.1",
     "coverage>=7.6.12",
     "mypy>=1.15.0",
+    "pytest>=8.3.5",
     "ruff>=0.9.4",
 ]
 
