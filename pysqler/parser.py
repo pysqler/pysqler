@@ -21,7 +21,7 @@ def extract_sql_nodes(tree: ast.AST) -> list[SqlAstNode]:
             continue
 
         if query := _maybe_extract_sql_query(node):
-            nodes.append(SqlAstNode(query = query, node = node))
+            nodes.append(SqlAstNode(query=query, node=node))
 
     return nodes
 
@@ -37,6 +37,7 @@ def _maybe_extract_sql_query(node: ast.Constant) -> None | tuple[Statement, ...]
                 return parsed
     return None
 
+
 def _find_placeholder(stmt: Statement) -> bool:
     q = [stmt.tokens]
 
@@ -46,6 +47,6 @@ def _find_placeholder(stmt: Statement) -> bool:
             if repr(token.ttype) == "Token.Name.Placeholder":
                 return True
             if hasattr(token, "tokens"):
-                q.append(getattr(token, "tokens"))
+                q.append(token.tokens)
 
     return False

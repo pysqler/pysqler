@@ -103,7 +103,7 @@ enable_error_code = [
 
 disallow_untyped_decorators = false
 
-untyped_calls_exclude = ["sqlparse.*"
+untyped_calls_exclude = ["sqlparse.parse"
 ]
 
 [[tool.mypy.overrides]]
