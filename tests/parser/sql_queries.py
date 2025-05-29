@@ -18,7 +18,7 @@ def create_table(conn):
     conn.commit()
 
 def insert_users(conn, user_data):
-    sql = "INSERT INTO users (name, age) VALUES (?, ?);"
+    sql = "INSERT INTO users (name, age, mode) VALUES (?, 123, ?);"
     conn.executemany(sql, user_data)
     conn.commit()
 

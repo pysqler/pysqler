@@ -36,3 +36,16 @@ def _maybe_extract_sql_query(node: ast.Constant) -> None | tuple[Statement, ...]
             if token.is_keyword:
                 return parsed
     return None
+
+def _find_placeholder(stmt: Statement) -> bool:
+    q = [stmt.tokens]
+
+    while q:
+        tokens = q.pop()
+        for token in tokens:
+            if repr(token.ttype) == "Token.Name.Placeholder":
+                return True
+            if hasattr(token, "tokens"):
+                q.append(getattr(token, "tokens"))
+
+    return False
