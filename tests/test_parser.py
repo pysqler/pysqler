@@ -17,11 +17,9 @@ def test_extract_sql_nodes() -> None:
 def test_find_placeholders() -> None:
     tree = ast.parse(UNDERTEST)
     nodes = parser.extract_sql_nodes(tree)
-    must_have_placeholders = [
-        "INSERT INTO users (name, age, mode) VALUES (?, 123, ?);",
-        "INSERT users (name, age, mode) VALUES (?, 123, 1);",
-    ]
+    must_have_placeholders = ["name", "age", "name", "age"]
     for node in nodes:
-        assert parser._find_placeholders(node.stmt) == (  # noqa: SLF001
-            node.stmt.normalized in must_have_placeholders
-        )
+        placeholders = parser._find_placeholders(node.stmt)
+        for idx, placeholder in enumerate(placeholders):
+            print(placeholder.table)
+            assert placeholder.field_name == must_have_placeholders[idx]

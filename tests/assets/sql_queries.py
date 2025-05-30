@@ -8,13 +8,14 @@ sql = """
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
         name TEXT NOT NULL,
-        age INTEGER
+        age INTEGER,
+        mood TEXT NOT NULL
     );
     """
 conn.execute(sql)
 
 users = [("Алиса", 30), ("Боб", 17), ("Карина", 25), ("Данил", 15)]
-sql = "INSERT INTO users (name, age, mode) VALUES (?, 123, ?);"
+sql = "INSERT INTO users (name, age, mood) VALUES (?, ?, 'asd');"
 conn.executemany(sql, users)
 
 cursor = conn.execute("SELECT id, name, age FROM users;")
@@ -31,7 +32,7 @@ conn.execute("SELECT sda FROM users;")
 conn.execute("SELECT name users;")
 
 user_data = ""
-sql = "INSERT INTO non_existing_table (name, age, mode) VALUES (1, 123, 1);"
+sql = "INSERT INTO non_existing_table (name, age, mood) VALUES ('asd', 123, 'asd');"
 conn.executemany(sql, user_data)
-sql = "INSERT users (name, age, mode) VALUES (?, 123, 1);"
+sql = "INSERT users (name, age, mood) VALUES (?, ?, 123);"
 conn.executemany(sql, user_data)

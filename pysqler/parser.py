@@ -1,14 +1,29 @@
 import ast
+from collections.abc import Iterable
 from dataclasses import dataclass
 
 import sqlparse
-from sqlparse.sql import Statement, Token, Identifier
-from collections.abc import Iterable
+from sqlparse.sql import (
+    Identifier,
+    IdentifierList,
+    Parenthesis,
+    Statement,
+    Token,
+    TokenList,
+    Values,
+)
+
+
+@dataclass
+class Placeholder:
+    value: str
+
 
 @dataclass
 class SQLPlaceHolder:
     table: str
     field_name: str
+
 
 @dataclass
 class SqlAstNode:
@@ -47,28 +62,69 @@ def _maybe_extract_sql_query(node: ast.Constant) -> list[Statement]:
                 break
     return result
 
+
 def _find_placeholders(stmt: Statement) -> list[SQLPlaceHolder]:
-    q = [stmt.tokens]
-    placeholders = [SQLPlaceHolder]
+    placeholders = []
     table_name = _extract_table_name(stmt)
+    fields = extract_fields(stmt)
+    values = extract_values(stmt)
+    assert len(fields) == len(values), f"{len(fields)=}, {len(values)=}"
+    for idx, value in enumerate(values):
+        if isinstance(value, Placeholder):
+            placeholder = SQLPlaceHolder(table=table_name, field_name=fields[idx])
+            placeholders.append(placeholder)
+    return placeholders
 
-    for token in walk_token(stmt):
-        fields = []
-        if repr(token.ttype) == "Token.Name.Placeholder":
-            return []
-
-    return []
 
 def _extract_table_name(stmt: Statement) -> str:
-    for token in walk_token(stmt):
+    for token in walk_tokens(stmt):
         if isinstance(token, Identifier):
             return token.normalized
     raise ValueError
 
-def walk_token(token_list: Statement.tokens) -> Iterable[Token]:
-    q = [token_list.tokens]
-    while q:
-        for token in q.pop():
-            yield token
-            if hasattr(token, "tokens"):
-                q.append(token.tokens)
+
+def extract_fields(stmt: Statement) -> list[str]:
+    fields: list[str] = []
+    for token in walk_tokens(stmt):
+        if isinstance(token, Parenthesis):
+            for identifier_list in token.tokens:
+                if isinstance(identifier_list, IdentifierList):
+                    fields.extend(
+                        identifier.value
+                        for identifier in identifier_list
+                        if isinstance(identifier, Identifier)
+                    )
+    return fields
+
+
+def extract_values(stmt: Statement) -> list[Placeholder | str]:
+    values = []
+    for token in walk_tokens(stmt):
+        if isinstance(token, Values):
+            for param in token.tokens:
+                if isinstance(param, Parenthesis):
+                    for identifier_list in param.tokens:
+                        if isinstance(identifier_list, IdentifierList):
+                            for identifier in identifier_list.tokens:
+                                if (
+                                    repr(identifier.ttype) != "Token.Punctuation"
+                                    and repr(identifier.ttype)
+                                    != "Token.Text.Whitespace"
+                                ):
+                                    if (
+                                        repr(identifier.ttype)
+                                        == "Token.Name.Placeholder"
+                                    ):
+                                        values.append(
+                                            Placeholder(value=identifier.value)
+                                        )
+                                    else:
+                                        values.append(identifier.value)
+    return values
+
+
+def walk_tokens(token_list: TokenList) -> Iterable[Token]:
+    for token in token_list.tokens:
+        yield token
+        if isinstance(token, TokenList):
+            yield from walk_tokens(token)
