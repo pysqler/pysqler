@@ -2,14 +2,19 @@ import ast
 from dataclasses import dataclass
 
 import sqlparse
-from sqlparse.sql import Statement
+from sqlparse.sql import Statement, Token, Identifier
+from collections.abc import Iterable
 
+@dataclass
+class SQLPlaceHolder:
+    table: str
+    field_name: str
 
 @dataclass
 class SqlAstNode:
     stmt: Statement
     node: ast.Constant
-    has_placeholders: bool
+    has_placeholders: list[SQLPlaceHolder]
 
 
 def extract_sql_nodes(tree: ast.AST) -> list[SqlAstNode]:
@@ -22,7 +27,7 @@ def extract_sql_nodes(tree: ast.AST) -> list[SqlAstNode]:
             continue
 
         nodes.extend(
-            SqlAstNode(stmt=stmt, node=node, has_placeholders=_find_placeholder(stmt))
+            SqlAstNode(stmt=stmt, node=node, has_placeholders=_find_placeholders(stmt))
             for stmt in _maybe_extract_sql_query(node)
         )
 
@@ -42,16 +47,28 @@ def _maybe_extract_sql_query(node: ast.Constant) -> list[Statement]:
                 break
     return result
 
-
-def _find_placeholder(stmt: Statement) -> bool:
+def _find_placeholders(stmt: Statement) -> list[SQLPlaceHolder]:
     q = [stmt.tokens]
+    placeholders = [SQLPlaceHolder]
+    table_name = _extract_table_name(stmt)
 
+    for token in walk_token(stmt):
+        fields = []
+        if repr(token.ttype) == "Token.Name.Placeholder":
+            return []
+
+    return []
+
+def _extract_table_name(stmt: Statement) -> str:
+    for token in walk_token(stmt):
+        if isinstance(token, Identifier):
+            return token.normalized
+    raise ValueError
+
+def walk_token(token_list: Statement.tokens) -> Iterable[Token]:
+    q = [token_list.tokens]
     while q:
-        tokens = q.pop()
-        for token in tokens:
-            if repr(token.ttype) == "Token.Name.Placeholder":
-                return True
+        for token in q.pop():
+            yield token
             if hasattr(token, "tokens"):
                 q.append(token.tokens)
-
-    return False

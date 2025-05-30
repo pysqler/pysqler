@@ -14,7 +14,7 @@ def test_extract_sql_nodes() -> None:
     assert len(nodes) == valid_sql_queries_amount
 
 
-def test_find_placeholder() -> None:
+def test_find_placeholders() -> None:
     tree = ast.parse(UNDERTEST)
     nodes = parser.extract_sql_nodes(tree)
     must_have_placeholders = [
@@ -22,6 +22,6 @@ def test_find_placeholder() -> None:
         "INSERT users (name, age, mode) VALUES (?, 123, 1);",
     ]
     for node in nodes:
-        assert parser._find_placeholder(node.stmt) == (  # noqa: SLF001
+        assert parser._find_placeholders(node.stmt) == (  # noqa: SLF001
             node.stmt.normalized in must_have_placeholders
         )
