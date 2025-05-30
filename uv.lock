@@ -59,6 +59,15 @@ wheels = [
 ]
 
 [[package]]
+name = "mimesis"
+version = "18.0.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/5d/f1/33fb02aa19271a5a2334d24a597047399744a3f1e8c97be31053887260b4/mimesis-18.0.0.tar.gz", hash = "sha256:7d7c76ecd680ae48afe8dc4413ef1ef1ee7ef20e16f9f9cb42892add642fc1b2", size = 4681287, upload-time = "2024-09-13T22:26:05.273Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b6/c8/0b91996ce5337bb877300d0a0e86df17ab72da573625348dcb6cd92c3c41/mimesis-18.0.0-py3-none-any.whl", hash = "sha256:a51854a5ce63ebf2bd6a98e8841412e04cede38593be7e16d1d712848e6273df", size = 4734674, upload-time = "2024-09-13T22:26:03.283Z" },
+]
+
+[[package]]
 name = "mypy"
 version = "1.15.0"
 source = { registry = "https://pypi.org/simple" }
@@ -109,6 +118,7 @@ name = "pysqler"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "mimesis" },
     { name = "sqlparse" },
 ]
 
@@ -122,7 +132,10 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "sqlparse", specifier = ">=0.5.3" }]
+requires-dist = [
+    { name = "mimesis", specifier = ">=18.0.0" },
+    { name = "sqlparse", specifier = ">=0.5.3" },
+]
 
 [package.metadata.requires-dev]
 dev = [

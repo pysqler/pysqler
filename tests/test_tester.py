@@ -2,7 +2,7 @@ import ast
 from pathlib import Path
 from sqlite3 import OperationalError
 
-from pysqler.parser import extract_sql_nodes
+from pysqler.parser import extract_schema_types, extract_sql_nodes
 from pysqler.tester import inspect_nodes
 
 ASSETS_PATH = Path(__file__).parent / "assets"
@@ -12,7 +12,7 @@ SCHEMA = (ASSETS_PATH / "schema.sql").read_text().split(";\n")
 
 def test_valid_query() -> None:
     tree = ast.parse(UNDERTEST)
-    nodes = extract_sql_nodes(tree)
+    nodes = extract_sql_nodes(tree, extract_schema_types("".join(SCHEMA)))
     invalids = inspect_nodes(nodes, schema=SCHEMA)
     expected = [
         OperationalError("no such table: non_existing_table"),

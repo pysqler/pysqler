@@ -12,17 +12,19 @@ SCHEMA = (ASSETS_PATH / "schema.sql").read_text()
 
 def test_extract_sql_nodes() -> None:
     tree = ast.parse(UNDERTEST)
-    nodes = parser.extract_sql_nodes(tree)
+    nodes = parser.extract_sql_nodes(tree, parser.extract_schema_types(SCHEMA))
     valid_sql_queries_amount = 10
     assert len(nodes) == valid_sql_queries_amount
 
 
 def test_find_placeholders() -> None:
     tree = ast.parse(UNDERTEST)
-    nodes = parser.extract_sql_nodes(tree)
+    nodes = parser.extract_sql_nodes(tree, parser.extract_schema_types(SCHEMA))
     must_have_placeholders = ["name", "age", "name", "age"]
     for node in nodes:
-        placeholders = parser._find_placeholders(node.stmt)  # noqa: SLF001
+        placeholders = parser._find_placeholders(  # noqa: SLF001
+            parser.extract_schema_types(SCHEMA), node.stmt
+        )
         for idx, placeholder in enumerate(placeholders):
             print(placeholder.table)
             assert placeholder.field_name == must_have_placeholders[idx]

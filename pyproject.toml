@@ -5,6 +5,7 @@ description = "Add your description here"
 readme = "README.org"
 requires-python = ">=3.13"
 dependencies = [
+    "mimesis>=18.0.0",
     "sqlparse>=0.5.3",
 ]
 

@@ -13,6 +13,11 @@ from sqlparse.sql import (
     Values,
 )
 
+TableName = str
+SqlFieldName = str
+SqlFieldType = str
+SqlFieldsTypes = dict[SqlFieldName, SqlFieldType]
+
 
 @dataclass
 class Placeholder:
@@ -21,18 +26,21 @@ class Placeholder:
 
 @dataclass
 class SQLPlaceHolder:
-    table: str
-    field_name: str
+    table: TableName
+    field_name: SqlFieldName
+    sql_type: SqlFieldType
 
 
 @dataclass
 class SqlAstNode:
     stmt: Statement
     node: ast.Constant
-    has_placeholders: list[SQLPlaceHolder]
+    placeholders: list[SQLPlaceHolder]
 
 
-def extract_sql_nodes(tree: ast.AST) -> list[SqlAstNode]:
+def extract_sql_nodes(
+    tree: ast.AST, schema: dict[TableName, SqlFieldsTypes]
+) -> list[SqlAstNode]:
     nodes: list[SqlAstNode] = []
     for node in ast.walk(tree):
         if not isinstance(node, ast.Constant):
@@ -42,7 +50,9 @@ def extract_sql_nodes(tree: ast.AST) -> list[SqlAstNode]:
             continue
 
         nodes.extend(
-            SqlAstNode(stmt=stmt, node=node, has_placeholders=_find_placeholders(stmt))
+            SqlAstNode(
+                stmt=stmt, node=node, placeholders=_find_placeholders(schema, stmt)
+            )
             for stmt in _maybe_extract_sql_query(node)
         )
 
@@ -63,7 +73,9 @@ def _maybe_extract_sql_query(node: ast.Constant) -> list[Statement]:
     return result
 
 
-def _find_placeholders(stmt: Statement) -> list[SQLPlaceHolder]:
+def _find_placeholders(
+    schema: dict[TableName, SqlFieldsTypes], stmt: Statement
+) -> list[SQLPlaceHolder]:
     placeholders = []
     table_name = _extract_table_name(stmt)
     fields = extract_fields(stmt)
@@ -71,7 +83,11 @@ def _find_placeholders(stmt: Statement) -> list[SQLPlaceHolder]:
     assert len(fields) == len(values), f"{len(fields)=}, {len(values)=}"
     for idx, value in enumerate(values):
         if isinstance(value, Placeholder):
-            placeholder = SQLPlaceHolder(table=table_name, field_name=fields[idx])
+            placeholder = SQLPlaceHolder(
+                table=table_name,
+                field_name=fields[idx],
+                sql_type=schema[table_name][fields[idx]],
+            )
             placeholders.append(placeholder)
     return placeholders
 
@@ -97,8 +113,18 @@ def extract_fields(stmt: Statement) -> list[str]:
     return fields
 
 
-def extract_fields_types(stmt: Statement) -> dict[str, str]:
-    result: dict[str, str] = {}
+def extract_schema_types(schema: str) -> dict[TableName, SqlFieldsTypes]:
+    schema_types: dict[TableName, SqlFieldsTypes] = {}
+    parsed = sqlparse.parse(schema)
+    for stmt in parsed:
+        table_name = _extract_table_name(stmt)
+        fields_types = extract_fields_types(stmt)
+        schema_types[table_name] = fields_types
+    return schema_types
+
+
+def extract_fields_types(stmt: Statement) -> SqlFieldsTypes:
+    result: SqlFieldsTypes = {}
     for token in walk_tokens(stmt):
         if isinstance(token, Parenthesis):
             field = None
