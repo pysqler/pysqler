@@ -24,3 +24,22 @@ def execute(conn: Connection, query: str) -> None:
     cursor = conn.cursor()
     cursor.execute(query)
     conn.rollback()
+
+def _to_python_type(sqlite_type: str) -> type:
+
+    sqlite_type = sqlite_type.strip().upper()
+
+    if "INT" in sqlite_type:
+        return int
+    elif "CHAR" in sqlite_type or "CLOB" in sqlite_type or "TEXT" in sqlite_type:
+        return str
+    elif "BLOB" in sqlite_type:
+        return bytes
+    elif "REAL" in sqlite_type or "FLOA" in sqlite_type or "DOUB" in sqlite_type:
+        return float
+    elif "NUMERIC" in sqlite_type or "DECIMAL" in sqlite_type:
+        return float
+    elif sqlite_type == "NULL":
+        return type(None)
+    else:
+        return str
