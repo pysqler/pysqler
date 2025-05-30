@@ -12,6 +12,14 @@ sql = """
         mood TEXT NOT NULL
     );
     """
+sql_mode = """
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        age INTEGER,
+        mode TEXT NOT NULL
+    );
+    """
 conn.execute(sql)
 
 users = [("Алиса", 30), ("Боб", 17), ("Карина", 25), ("Данил", 15)]

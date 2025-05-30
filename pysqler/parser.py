@@ -97,29 +97,49 @@ def extract_fields(stmt: Statement) -> list[str]:
     return fields
 
 
-def extract_values(stmt: Statement) -> list[Placeholder | str]:
-    values = []
+def extract_fields_types(stmt: Statement) -> dict[str, str]:
+    result: dict[str, str] = {}
     for token in walk_tokens(stmt):
-        if isinstance(token, Values):
-            for param in token.tokens:
-                if isinstance(param, Parenthesis):
-                    for identifier_list in param.tokens:
-                        if isinstance(identifier_list, IdentifierList):
-                            for identifier in identifier_list.tokens:
-                                if (
-                                    repr(identifier.ttype) != "Token.Punctuation"
-                                    and repr(identifier.ttype)
-                                    != "Token.Text.Whitespace"
-                                ):
-                                    if (
-                                        repr(identifier.ttype)
-                                        == "Token.Name.Placeholder"
-                                    ):
-                                        values.append(
-                                            Placeholder(value=identifier.value)
-                                        )
-                                    else:
-                                        values.append(identifier.value)
+        if isinstance(token, Parenthesis):
+            field = None
+            field_type = None
+            for identifier in token.tokens:
+                if isinstance(identifier, IdentifierList):
+                    for deep_identifier in identifier.tokens:
+                        if isinstance(deep_identifier, Identifier):
+                            field = deep_identifier.value
+                if isinstance(identifier, Identifier):
+                    field = identifier.value
+                if repr(identifier.ttype) == "Token.Name.Builtin":
+                    field_type = identifier.value
+                if field is not None and field_type is not None:
+                    print(f"{field=}, {field_type=}")
+                    result[field] = field_type
+                    field = None
+                    field_type = None
+    return result
+
+
+def extract_values(stmt: Statement) -> list[Placeholder | str]:
+    values: list[Placeholder | str] = []
+    for token in walk_tokens(stmt):
+        if not isinstance(token, Values):
+            continue
+        for param in token.tokens:
+            if not isinstance(param, Parenthesis):
+                continue
+            for identifier_list in param.tokens:
+                if not isinstance(identifier_list, IdentifierList):
+                    continue
+                for identifier in identifier_list.tokens:
+                    if (
+                        repr(identifier.ttype) != "Token.Punctuation"
+                        and repr(identifier.ttype) != "Token.Text.Whitespace"
+                    ):
+                        if repr(identifier.ttype) == "Token.Name.Placeholder":
+                            values.append(Placeholder(value=identifier.value))
+                        else:
+                            values.append(identifier.value)
     return values
 
 
