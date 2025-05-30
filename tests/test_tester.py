@@ -16,6 +16,7 @@ def test_valid_query() -> None:
     invalids = inspect_nodes(nodes, schema=SCHEMA)
     expected = [
         OperationalError("no such table: non_existing_table"),
+        OperationalError('near "users": syntax error'),
         OperationalError("no such table: non_existing_table"),
         OperationalError('near "SELEC": syntax error'),
         OperationalError("no such column: sda"),

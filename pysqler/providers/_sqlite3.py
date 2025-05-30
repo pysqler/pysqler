@@ -30,7 +30,7 @@ def execute(conn: Connection, query: str, args: tuple[Any, ...]) -> None:
     conn.rollback()
 
 
-def to_python_type(sqlite_type: str) -> type:
+def to_python_type(sqlite_type: str) -> type[Any]:
     sqlite_type = sqlite_type.strip().upper()
 
     if "INT" in sqlite_type:

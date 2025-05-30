@@ -23,5 +23,9 @@ def test_fetches_valid_schema(conn: sqlite3.Connection) -> None:
     cursor = conn.cursor()
     for table in sql:
         cursor.execute(table)
-    expected = {"users": {"id": "INTEGER", "name": "TEXT", "age": "INTEGER"}}
+    expected = {
+        "users": {"id": "INTEGER", "name": "TEXT", "age": "INTEGER"},
+        "users1": {"id": "INTEGER", "surname": "TEXT", "age": "INTEGER"},
+        "users2": {"id": "INTEGER", "balance": "INTEGER"},
+    }
     assert _sqlite3.extract_schema(conn) == expected

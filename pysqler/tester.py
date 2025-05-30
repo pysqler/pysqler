@@ -45,6 +45,6 @@ def mock_data[T](python_type: type[T]) -> T:
         bytes: generic.random.randbytes,
         float: generic.numeric.float_number,
     }
-    result = generators[python_type]()
+    result = generators[python_type]()  # type: ignore
     assert isinstance(result, python_type)
     return result
